@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fralda Barata — compare preços e economize",
+  title: "Mamãe economiza — compare preços e economize",
   description:
     "Compare preços de fraldas e produtos de bebê entre Amazon, Mercado Livre e Shopee e encontre a melhor oferta.",
 };

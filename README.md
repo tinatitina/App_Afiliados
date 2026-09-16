@@ -1,4 +1,4 @@
-# Fralda Barata
+# Mamãe economiza
 
 Motor de busca e comparação de preços para produtos de bebê (começando por
 fraldas) entre **Amazon**, **Mercado Livre** e **Shopee**, com links de

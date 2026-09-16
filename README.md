@@ -8,17 +8,38 @@ venda vai para você.
 ## Como funciona
 
 - **Mercado Livre**: preços ao vivo via API pública de busca
-  (`src/lib/providers/mercadolivre.ts`). O link de afiliado é montado na
-  hora, anexando os parâmetros `matt_word`/`matt_tool` à URL do produto
-  (`src/lib/affiliate.ts`) — não existe API de afiliados do ML, então essa é
-  a forma suportada de rastrear.
+  (`src/lib/providers/mercadolivre.ts`). Devolve o permalink "cru" do
+  produto — sem link de afiliado embutido.
 - **Amazon e Shopee**: catálogo manual em `src/data/products.ts`. Não há
   como automatizar a busca sem violar os termos de uso dessas plataformas
   (scraping) ou sem acesso aprovado à API oficial (a Amazon PA-API só libera
   acesso depois de vendas qualificadas). Por isso você cadastra os produtos
-  à mão, com o preço e o link de afiliado prontos, e revisa periodicamente.
+  à mão — preço, `originalPrice` quando houver promoção, e a URL do produto
+  (ou, no caso da Shopee, o link de afiliado já pronto) — e revisa
+  periodicamente. **Cadência recomendada: a cada 2 dias.** Se um preço
+  manual passar disso sem ser conferido, o site mostra um badge "Verificar
+  preço" — não escondemos preço velho, só sinalizamos.
+- **Resolução de afiliado** (`src/lib/affiliate.ts`): um único ponto,
+  `resolveAffiliateUrl(marketplace, url)`, decide como cada plataforma vira
+  link de comissão (ML: anexa `matt_word`/`matt_tool`; Amazon: anexa `tag`;
+  Shopee: repassa a URL como veio, já que o link é gerado manualmente no
+  portal deles). Ele é chamado uma única vez, em `src/lib/search.ts`, para
+  toda oferta — manual ou ao vivo. Isso existe porque a primeira versão
+  tinha o helper da Amazon pronto mas nunca chamado, e nenhum link da
+  Amazon rastreava comissão; centralizar evita essa classe de bug.
+- **Preço por unidade** (`src/lib/pricing.ts`): a busca ordena e escolhe a
+  "melhor oferta" pelo preço dividido pela quantidade de unidades do
+  pacote (`packCount`), não pelo preço total — é isso que permite comparar
+  de verdade um pacote de 30 com um de 56. Cadastre `packCount` em todo
+  produto do catálogo.
 - **Busca**: `src/lib/search.ts` combina catálogo manual + Mercado Livre ao
-  vivo, filtra por marca/tamanho/texto e ordena pelo menor preço.
+  vivo, filtra por marca/tamanho/texto/plataforma e ordena por preço/unidade.
+- **Maiores Ofertas**: `getTopDeals()` em `search.ts` pega as ofertas
+  manuais com `originalPrice` cadastrado e maior desconto, pro bloco de
+  destaque no topo da home.
+- **Calculadora** (`/calculadora`): pra produtos fora do catálogo, o
+  visitante digita preço e quantidade de cada opção e compara o preço por
+  unidade na hora — sem precisar que o produto esteja cadastrado.
 
 ## Antes de divulgar o site
 

@@ -1,7 +1,10 @@
 import { MARKETPLACE_COLOR, MARKETPLACE_LABEL, formatBRL, formatDate } from "@/lib/marketplace";
-import type { Offer } from "@/lib/types";
+import { isStalePrice } from "@/lib/pricing";
+import type { DisplayOffer } from "@/lib/types";
 
-export function OfferRow({ offer, isBest }: { offer: Offer; isBest: boolean }) {
+export function OfferRow({ offer, isBest }: { offer: DisplayOffer; isBest: boolean }) {
+  const stale = offer.isManualPrice && isStalePrice(offer.updatedAt);
+
   return (
     <li
       className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2 ${
@@ -11,7 +14,7 @@ export function OfferRow({ offer, isBest }: { offer: Offer; isBest: boolean }) {
       }`}
     >
       <div className="flex min-w-0 flex-col gap-1">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span
             className={`rounded px-1.5 py-0.5 text-xs font-medium ${MARKETPLACE_COLOR[offer.marketplace]}`}
           >
@@ -19,12 +22,25 @@ export function OfferRow({ offer, isBest }: { offer: Offer; isBest: boolean }) {
           </span>
           {isBest && (
             <span className="rounded bg-emerald-600 px-1.5 py-0.5 text-xs font-semibold text-white">
-              Melhor preço
+              Melhor preço/unidade
+            </span>
+          )}
+          {offer.discountPercent !== null && (
+            <span className="rounded bg-rose-600 px-1.5 py-0.5 text-xs font-semibold text-white">
+              -{offer.discountPercent}%
             </span>
           )}
           {!offer.available && (
             <span className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
               Indisponível
+            </span>
+          )}
+          {stale && (
+            <span
+              className="rounded bg-amber-200 px-1.5 py-0.5 text-xs text-amber-900 dark:bg-amber-900/50 dark:text-amber-200"
+              title="Preço conferido há mais de 2 dias — confirme antes de divulgar"
+            >
+              Verificar preço
             </span>
           )}
         </div>
@@ -37,9 +53,15 @@ export function OfferRow({ offer, isBest }: { offer: Offer; isBest: boolean }) {
       </div>
 
       <div className="flex shrink-0 flex-col items-end gap-1">
+        {offer.originalPrice && offer.discountPercent !== null && (
+          <span className="text-xs text-zinc-400 line-through">{formatBRL(offer.originalPrice)}</span>
+        )}
         <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           {formatBRL(offer.price)}
         </span>
+        {offer.unitPrice !== null && (
+          <span className="text-xs text-zinc-500">{formatBRL(offer.unitPrice)}/unidade</span>
+        )}
         <a
           href={offer.url}
           target="_blank"

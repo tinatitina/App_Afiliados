@@ -15,9 +15,11 @@ import type { Product } from "@/lib/types";
  *      (não dá pra automatizar por parâmetro de URL) e cole a URL completa.
  *    - Mercado Livre: não precisa cadastrar aqui — a busca é ao vivo via API
  *      (ver src/lib/providers/mercadolivre.ts).
- * 2. Atualize `price` e `updatedAt` sempre que conferir o preço (o site
- *    mostra "atualizado em" para cada oferta manual, então preços velhos
- *    ficam visíveis para você e para quem visita).
+ * 2. Atualize `price` e `updatedAt` sempre que conferir o preço — o
+ *    recomendado é a cada 2 dias. O site mostra "atualizado em" e, se
+ *    passar de 2 dias, um badge "Verificar preço" para cada oferta manual.
+ *    Preencha `originalPrice` só quando o produto estiver mesmo em
+ *    promoção (vira o badge de desconto e entra no bloco "Maiores Ofertas").
  * 3. Quando isso crescer, vale migrar de um arquivo .ts para uma planilha
  *    ou banco de dados — ver sugestão no README.
  */
@@ -37,6 +39,7 @@ export const products: Product[] = [
         marketplace: "amazon",
         title: "Pampers Confort Sec, Fralda, Tamanho G, 46 unidades",
         price: 64.9,
+        originalPrice: 79.9,
         currency: "BRL",
         url: "https://www.amazon.com.br/dp/EXEMPLO-ASIN-1",
         available: true,
@@ -78,6 +81,7 @@ export const products: Product[] = [
         marketplace: "shopee",
         title: "Fralda Huggies Turma da Mônica M 56un",
         price: 55.9,
+        originalPrice: 69.9,
         currency: "BRL",
         url: "https://shopee.com.br/product/exemplo-2",
         available: true,

@@ -1,5 +1,12 @@
+import type { Marketplace } from "@/lib/types";
+
 /**
- * Geradores de link de afiliado.
+ * Módulo único de resolução de link de afiliado: toda oferta (manual ou
+ * ao vivo) passa por `resolveAffiliateUrl` antes de chegar na tela. Isso
+ * evita o que aconteceu na primeira versão — o tag da Amazon existia como
+ * helper mas nunca era chamado, então nenhum link da Amazon rastreava
+ * comissão. Centralizar a resolução por marketplace aqui, num único lugar,
+ * é o que impede esse tipo de bug de silenciosamente voltar.
  *
  * - Mercado Livre: não existe API de afiliados. O programa
  *   (afiliados.mercadolivre.com.br) usa os parâmetros de rastreamento
@@ -11,7 +18,8 @@
  * - Shopee: o programa de afiliados não documenta um parâmetro de URL
  *   estável — os links são gerados um a um dentro do app/portal do
  *   Shopee Afiliados. Por isso as ofertas da Shopee ficam no catálogo
- *   manual com a URL de afiliado já pronta (colada do painel deles).
+ *   manual com a URL de afiliado já pronta (colada do painel deles), e
+ *   o resolver só a repassa sem alteração.
  */
 
 function appendParams(baseUrl: string, params: Record<string, string>): string {
@@ -47,5 +55,22 @@ export function buildAmazonAffiliateUrl(productUrl: string): string {
     return appendParams(productUrl, { tag });
   } catch {
     return productUrl;
+  }
+}
+
+/**
+ * Ponto único por onde toda URL de oferta deve passar antes de ser
+ * exibida. Chame isto ao montar o `ResolvedProduct`, nunca dentro de um
+ * provider individual — assim nenhuma plataforma nova esquece a comissão.
+ */
+export function resolveAffiliateUrl(marketplace: Marketplace, productUrl: string): string {
+  switch (marketplace) {
+    case "amazon":
+      return buildAmazonAffiliateUrl(productUrl);
+    case "mercadolivre":
+      return buildMercadoLivreAffiliateUrl(productUrl);
+    case "shopee":
+      // Link já vem pronto do painel Shopee Afiliados (ver nota acima).
+      return productUrl;
   }
 }

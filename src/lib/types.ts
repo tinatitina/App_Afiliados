@@ -13,8 +13,10 @@ export interface Offer {
   /** Título do anúncio como aparece no marketplace (pode variar do nome canônico do produto). */
   title: string;
   price: number;
+  /** Preço "de tabela" antes do desconto, quando conhecido (para o badge de % off). */
+  originalPrice?: number;
   currency: "BRL";
-  /** URL final já com os parâmetros de afiliado aplicados. */
+  /** URL do produto. Vira link de afiliado ao passar por `resolveAffiliateUrl`. */
   url: string;
   imageUrl?: string;
   rating?: number;
@@ -24,6 +26,14 @@ export interface Offer {
   updatedAt: string;
   /** true quando o preço veio de catálogo manual (precisa revisão periódica), false quando é ao vivo via API. */
   isManualPrice: boolean;
+}
+
+/** Offer já resolvida para exibição: link de afiliado aplicado + métricas calculadas. */
+export interface DisplayOffer extends Offer {
+  /** Preço dividido pela quantidade de unidades do pacote (null se não der pra calcular). */
+  unitPrice: number | null;
+  /** % de desconto vs. originalPrice (null se não houver desconto). */
+  discountPercent: number | null;
 }
 
 /** Produto canônico: agrupa ofertas equivalentes de diferentes marketplaces. */
@@ -43,8 +53,8 @@ export interface Product {
 
 /** Produto já resolvido para exibição: catálogo manual + ofertas ao vivo mescladas. */
 export interface ResolvedProduct extends Omit<Product, "manualOffers"> {
-  offers: Offer[];
-  bestOffer: Offer | null;
+  offers: DisplayOffer[];
+  bestOffer: DisplayOffer | null;
 }
 
 export interface SearchFilters {
@@ -52,4 +62,5 @@ export interface SearchFilters {
   category?: Category;
   brand?: string;
   size?: string;
+  marketplace?: Marketplace;
 }

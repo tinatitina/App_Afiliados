@@ -1,4 +1,3 @@
-import { buildMercadoLivreAffiliateUrl } from "@/lib/affiliate";
 import type { Offer } from "@/lib/types";
 
 const SITE_ID = "MLB"; // Brasil
@@ -25,6 +24,10 @@ interface MLSearchResponse {
  * garantido (pode devolver 403 para alguns IPs/volumes). Por isso o
  * catálogo nunca deve depender só dela: em caso de erro, devolvemos
  * lista vazia e o produto continua aparecendo com as ofertas manuais.
+ *
+ * `url` aqui é o permalink cru do produto — o tag de afiliado é aplicado
+ * depois, de forma centralizada, por `resolveAffiliateUrl` em
+ * `src/lib/search.ts`. Nenhum provider deve montar link de afiliado sozinho.
  */
 export async function searchMercadoLivre(query: string, limit = 4): Promise<Offer[]> {
   const url = `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&limit=${limit}`;
@@ -50,7 +53,7 @@ export async function searchMercadoLivre(query: string, limit = 4): Promise<Offe
         title: item.title,
         price: item.price,
         currency: "BRL" as const,
-        url: buildMercadoLivreAffiliateUrl(item.permalink),
+        url: item.permalink,
         imageUrl: item.thumbnail,
         rating: item.reviews?.rating_average,
         reviewsCount: item.reviews?.total,

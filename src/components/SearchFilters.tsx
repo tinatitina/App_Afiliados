@@ -1,4 +1,7 @@
-import type { SearchFilters as SearchFiltersType } from "@/lib/types";
+import { MARKETPLACE_LABEL } from "@/lib/marketplace";
+import type { Marketplace, SearchFilters as SearchFiltersType } from "@/lib/types";
+
+const MARKETPLACES: Marketplace[] = ["amazon", "mercadolivre", "shopee"];
 
 export function SearchFilters({
   brands,
@@ -58,6 +61,25 @@ export function SearchFilters({
           {sizes.map((size) => (
             <option key={size} value={size}>
               {size}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label htmlFor="marketplace" className="text-xs font-medium text-zinc-500">
+          Plataforma
+        </label>
+        <select
+          id="marketplace"
+          name="marketplace"
+          defaultValue={current.marketplace ?? ""}
+          className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+        >
+          <option value="">Todas</option>
+          {MARKETPLACES.map((mp) => (
+            <option key={mp} value={mp}>
+              {MARKETPLACE_LABEL[mp]}
             </option>
           ))}
         </select>

@@ -1,0 +1,162 @@
+import type { Product } from "@/lib/types";
+
+/**
+ * CATÁLOGO DE EXEMPLO — troque pelos seus dados reais antes de divulgar o site.
+ *
+ * Os preços e URLs de Amazon/Shopee abaixo são fictícios (não é scraping nem
+ * dado real de nenhum marketplace). Eles existem só para você ver a busca
+ * funcionando. Antes de lançar:
+ *
+ * 1. Gere seus links reais de afiliado:
+ *    - Amazon: SiteStripe na página do produto (amazon.com.br) → copie a URL
+ *      com `?tag=SEUTAG-20`, ou deixe a AMAZON_ASSOCIATE_TAG configurada no
+ *      .env e cole a URL "limpa" do produto aqui, que o tag é adicionado sozinho.
+ *    - Shopee: gere o link dentro do app/portal do Shopee Afiliados
+ *      (não dá pra automatizar por parâmetro de URL) e cole a URL completa.
+ *    - Mercado Livre: não precisa cadastrar aqui — a busca é ao vivo via API
+ *      (ver src/lib/providers/mercadolivre.ts).
+ * 2. Atualize `price` e `updatedAt` sempre que conferir o preço (o site
+ *    mostra "atualizado em" para cada oferta manual, então preços velhos
+ *    ficam visíveis para você e para quem visita).
+ * 3. Quando isso crescer, vale migrar de um arquivo .ts para uma planilha
+ *    ou banco de dados — ver sugestão no README.
+ */
+export const CATALOG_IS_SAMPLE_DATA = true;
+
+export const products: Product[] = [
+  {
+    id: "pampers-confort-sec-g",
+    category: "fraldas",
+    brand: "Pampers",
+    name: "Pampers Confort Sec",
+    size: "G",
+    packCount: 46,
+    mercadoLivreQuery: "fralda pampers confort sec G",
+    manualOffers: [
+      {
+        marketplace: "amazon",
+        title: "Pampers Confort Sec, Fralda, Tamanho G, 46 unidades",
+        price: 64.9,
+        currency: "BRL",
+        url: "https://www.amazon.com.br/dp/EXEMPLO-ASIN-1",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+      {
+        marketplace: "shopee",
+        title: "Fralda Pampers Confort Sec G 46un",
+        price: 61.5,
+        currency: "BRL",
+        url: "https://shopee.com.br/product/exemplo-1",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+    ],
+  },
+  {
+    id: "huggies-turma-da-monica-m",
+    category: "fraldas",
+    brand: "Huggies",
+    name: "Huggies Turma da Mônica",
+    size: "M",
+    packCount: 56,
+    mercadoLivreQuery: "fralda huggies turma da monica M",
+    manualOffers: [
+      {
+        marketplace: "amazon",
+        title: "Huggies Turma da Mônica, Fralda, Tamanho M, 56 unidades",
+        price: 58.9,
+        currency: "BRL",
+        url: "https://www.amazon.com.br/dp/EXEMPLO-ASIN-2",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+      {
+        marketplace: "shopee",
+        title: "Fralda Huggies Turma da Mônica M 56un",
+        price: 55.9,
+        currency: "BRL",
+        url: "https://shopee.com.br/product/exemplo-2",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+    ],
+  },
+  {
+    id: "mamypoko-pants-xg",
+    category: "fraldas",
+    brand: "MamyPoko",
+    name: "MamyPoko Pants Extra Secos",
+    size: "XG",
+    packCount: 34,
+    mercadoLivreQuery: "fralda mamypoko pants extra secos XG",
+    manualOffers: [
+      {
+        marketplace: "amazon",
+        title: "MamyPoko Pants Extra Secos, Fralda Calça, Tamanho XG, 34 unidades",
+        price: 69.9,
+        currency: "BRL",
+        url: "https://www.amazon.com.br/dp/EXEMPLO-ASIN-3",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+    ],
+  },
+  {
+    id: "babysec-sec-protege-rn",
+    category: "fraldas",
+    brand: "BabySec",
+    name: "BabySec Sec & Protege",
+    size: "RN",
+    packCount: 40,
+    mercadoLivreQuery: "fralda babysec sec e protege recem nascido",
+    manualOffers: [
+      {
+        marketplace: "shopee",
+        title: "Fralda BabySec Sec & Protege RN 40un",
+        price: 39.9,
+        currency: "BRL",
+        url: "https://shopee.com.br/product/exemplo-3",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+    ],
+  },
+  {
+    id: "pompom-premium-p",
+    category: "fraldas",
+    brand: "Pom Pom",
+    name: "Pom Pom Premium",
+    size: "P",
+    packCount: 48,
+    mercadoLivreQuery: "fralda pom pom premium P",
+    manualOffers: [
+      {
+        marketplace: "amazon",
+        title: "Pom Pom Premium, Fralda, Tamanho P, 48 unidades",
+        price: 49.9,
+        currency: "BRL",
+        url: "https://www.amazon.com.br/dp/EXEMPLO-ASIN-4",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+      {
+        marketplace: "shopee",
+        title: "Fralda Pom Pom Premium P 48un",
+        price: 47.9,
+        currency: "BRL",
+        url: "https://shopee.com.br/product/exemplo-4",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+    ],
+  },
+];

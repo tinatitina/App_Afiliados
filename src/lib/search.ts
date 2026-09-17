@@ -1,7 +1,6 @@
 import { products } from "@/data/products";
 import { resolveAffiliateUrl } from "@/lib/affiliate";
 import { computeDiscountPercent, computeUnitPrice } from "@/lib/pricing";
-import { searchMercadoLivre } from "@/lib/providers/mercadolivre";
 import type { DisplayOffer, Offer, Product, ResolvedProduct, SearchFilters } from "@/lib/types";
 
 function matchesFilters(product: Product, filters: SearchFilters): boolean {
@@ -45,11 +44,7 @@ function pickBestOffer(offers: DisplayOffer[]): DisplayOffer | null {
 }
 
 async function resolveProduct(product: Product, marketplaceFilter?: Offer["marketplace"]): Promise<ResolvedProduct> {
-  const liveOffers = product.mercadoLivreQuery
-    ? await searchMercadoLivre(product.mercadoLivreQuery, 3)
-    : [];
-
-  let offers = [...product.manualOffers, ...liveOffers].map((o) => toDisplayOffer(o, product.packCount));
+  let offers = product.manualOffers.map((o) => toDisplayOffer(o, product.packCount));
 
   if (marketplaceFilter) {
     offers = offers.filter((o) => o.marketplace === marketplaceFilter);
@@ -63,7 +58,6 @@ async function resolveProduct(product: Product, marketplaceFilter?: Offer["marke
     size: product.size,
     packCount: product.packCount,
     imageUrl: product.imageUrl,
-    mercadoLivreQuery: product.mercadoLivreQuery,
     offers,
     bestOffer: pickBestOffer(offers),
   };
@@ -71,9 +65,11 @@ async function resolveProduct(product: Product, marketplaceFilter?: Offer["marke
 
 /**
  * Busca produtos no catálogo aplicando filtros e resolve as ofertas
- * (manuais + Mercado Livre ao vivo) em paralelo para cada resultado.
- * Ordena por preço/unidade — não pelo preço total do pacote — porque é
- * isso que permite comparar embalagens de tamanhos diferentes de verdade.
+ * (todas manuais — ver nota em `src/data/products.ts` sobre por que o
+ * Mercado Livre também é manual por enquanto) em paralelo para cada
+ * resultado. Ordena por preço/unidade — não pelo preço total do pacote —
+ * porque é isso que permite comparar embalagens de tamanhos diferentes
+ * de verdade.
  */
 export async function searchProducts(filters: SearchFilters = {}): Promise<ResolvedProduct[]> {
   const matched = products.filter((p) => matchesFilters(p, filters));

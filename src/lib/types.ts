@@ -45,9 +45,7 @@ export interface Product {
   size?: string;
   packCount?: number;
   imageUrl?: string;
-  /** Termo de busca usado para consultar a API do Mercado Livre em tempo real. */
-  mercadoLivreQuery?: string;
-  /** Ofertas carregadas manualmente (Amazon, Shopee, etc.). */
+  /** Ofertas carregadas manualmente (Amazon, Mercado Livre, Shopee). */
   manualOffers: Offer[];
 }
 

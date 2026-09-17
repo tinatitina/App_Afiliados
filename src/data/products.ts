@@ -3,21 +3,30 @@ import type { Product } from "@/lib/types";
 /**
  * CATÁLOGO DE EXEMPLO — troque pelos seus dados reais antes de divulgar o site.
  *
- * Os preços e URLs de Amazon/Shopee abaixo são fictícios (não é scraping nem
- * dado real de nenhum marketplace). Eles existem só para você ver a busca
- * funcionando. Antes de lançar:
+ * Os preços e URLs abaixo são fictícios (não é scraping nem dado real de
+ * nenhum marketplace). Eles existem só para você ver a busca funcionando.
+ *
+ * As três plataformas são cadastradas à mão aqui. O Mercado Livre também
+ * virou catálogo manual: desde abril de 2025 a API pública de busca deles
+ * passou a exigir um access token vinculado a uma conta de usuário (não dá
+ * mais pra consultar preço sem login autorizado). Fazer isso direito exige
+ * OAuth completo + um lugar pra guardar o token que se renova sozinho —
+ * ver "Próximos passos" no README se um dia quiser automatizar isso.
+ *
+ * Antes de lançar:
  *
  * 1. Gere seus links reais de afiliado:
  *    - Amazon: SiteStripe na página do produto (amazon.com.br) → copie a URL
  *      com `?tag=SEUTAG-20`, ou deixe a AMAZON_ASSOCIATE_TAG configurada no
  *      .env e cole a URL "limpa" do produto aqui, que o tag é adicionado sozinho.
+ *    - Mercado Livre: cole a URL "limpa" do produto (produto.mercadolivre.com.br/...);
+ *      o matt_word/matt_tool da ML_AFFILIATE_MATT_WORD/TOOL é adicionado sozinho,
+ *      igual à Amazon.
  *    - Shopee: gere o link dentro do app/portal do Shopee Afiliados
  *      (não dá pra automatizar por parâmetro de URL) e cole a URL completa.
- *    - Mercado Livre: não precisa cadastrar aqui — a busca é ao vivo via API
- *      (ver src/lib/providers/mercadolivre.ts).
  * 2. Atualize `price` e `updatedAt` sempre que conferir o preço — o
- *    recomendado é a cada 2 dias. O site mostra "atualizado em" e, se
- *    passar de 2 dias, um badge "Verificar preço" para cada oferta manual.
+ *    recomendado é a cada 2 dias, nas três plataformas. O site mostra
+ *    "atualizado em" e, se passar de 2 dias, um badge "Verificar preço".
  *    Preencha `originalPrice` só quando o produto estiver mesmo em
  *    promoção (vira o badge de desconto e entra no bloco "Maiores Ofertas").
  * 3. Quando isso crescer, vale migrar de um arquivo .ts para uma planilha
@@ -33,7 +42,6 @@ export const products: Product[] = [
     name: "Pampers Confort Sec",
     size: "G",
     packCount: 46,
-    mercadoLivreQuery: "fralda pampers confort sec G",
     manualOffers: [
       {
         marketplace: "amazon",
@@ -42,6 +50,16 @@ export const products: Product[] = [
         originalPrice: 79.9,
         currency: "BRL",
         url: "https://www.amazon.com.br/dp/EXEMPLO-ASIN-1",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+      {
+        marketplace: "mercadolivre",
+        title: "Fralda Pampers Confort Sec G 46un",
+        price: 62.9,
+        currency: "BRL",
+        url: "https://produto.mercadolivre.com.br/exemplo-1",
         available: true,
         updatedAt: "2026-09-01",
         isManualPrice: true,
@@ -65,7 +83,6 @@ export const products: Product[] = [
     name: "Huggies Turma da Mônica",
     size: "M",
     packCount: 56,
-    mercadoLivreQuery: "fralda huggies turma da monica M",
     manualOffers: [
       {
         marketplace: "amazon",
@@ -73,6 +90,16 @@ export const products: Product[] = [
         price: 58.9,
         currency: "BRL",
         url: "https://www.amazon.com.br/dp/EXEMPLO-ASIN-2",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+      {
+        marketplace: "mercadolivre",
+        title: "Fralda Huggies Turma da Mônica M 56un",
+        price: 57.9,
+        currency: "BRL",
+        url: "https://produto.mercadolivre.com.br/exemplo-2",
         available: true,
         updatedAt: "2026-09-01",
         isManualPrice: true,
@@ -97,7 +124,6 @@ export const products: Product[] = [
     name: "MamyPoko Pants Extra Secos",
     size: "XG",
     packCount: 34,
-    mercadoLivreQuery: "fralda mamypoko pants extra secos XG",
     manualOffers: [
       {
         marketplace: "amazon",
@@ -105,6 +131,16 @@ export const products: Product[] = [
         price: 69.9,
         currency: "BRL",
         url: "https://www.amazon.com.br/dp/EXEMPLO-ASIN-3",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+      {
+        marketplace: "mercadolivre",
+        title: "Fralda Calça MamyPoko Pants Extra Secos XG 34un",
+        price: 67.9,
+        currency: "BRL",
+        url: "https://produto.mercadolivre.com.br/exemplo-3",
         available: true,
         updatedAt: "2026-09-01",
         isManualPrice: true,
@@ -118,8 +154,17 @@ export const products: Product[] = [
     name: "BabySec Sec & Protege",
     size: "RN",
     packCount: 40,
-    mercadoLivreQuery: "fralda babysec sec e protege recem nascido",
     manualOffers: [
+      {
+        marketplace: "mercadolivre",
+        title: "Fralda BabySec Sec & Protege RN 40un",
+        price: 41.9,
+        currency: "BRL",
+        url: "https://produto.mercadolivre.com.br/exemplo-4",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
       {
         marketplace: "shopee",
         title: "Fralda BabySec Sec & Protege RN 40un",
@@ -139,7 +184,6 @@ export const products: Product[] = [
     name: "Pom Pom Premium",
     size: "P",
     packCount: 48,
-    mercadoLivreQuery: "fralda pom pom premium P",
     manualOffers: [
       {
         marketplace: "amazon",
@@ -147,6 +191,16 @@ export const products: Product[] = [
         price: 49.9,
         currency: "BRL",
         url: "https://www.amazon.com.br/dp/EXEMPLO-ASIN-4",
+        available: true,
+        updatedAt: "2026-09-01",
+        isManualPrice: true,
+      },
+      {
+        marketplace: "mercadolivre",
+        title: "Fralda Pom Pom Premium P 48un",
+        price: 48.5,
+        currency: "BRL",
+        url: "https://produto.mercadolivre.com.br/exemplo-5",
         available: true,
         updatedAt: "2026-09-01",
         isManualPrice: true,

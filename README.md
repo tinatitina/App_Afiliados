@@ -8,7 +8,9 @@ venda vai para você.
 ## Como funciona
 
 - **Amazon, Mercado Livre e Shopee**: catálogo 100% manual em
-  `src/data/products.ts`. Não há como automatizar a busca sem violar os
+  `src/data/products.json` (tipado por `src/data/products.ts`, que só
+  importa o JSON — edite o `.json`, não o `.ts`). Não há como automatizar
+  a busca sem violar os
   termos de uso dessas plataformas (scraping), e cada API oficial tem uma
   barreira própria:
   - Amazon PA-API só libera acesso depois de vendas qualificadas.
@@ -47,9 +49,46 @@ venda vai para você.
   visitante digita preço e quantidade de cada opção e compara o preço por
   unidade na hora — sem precisar que o produto esteja cadastrado.
 
+## Formato do catálogo (`src/data/products.json`)
+
+Um array de **produtos**, cada um com uma ou mais **ofertas** (uma por
+plataforma onde o produto é vendido). Isso é o que uma automação (Cowork
+ou qualquer outra) precisa gerar/atualizar.
+
+**Produto:**
+
+| Campo | Tipo | Obrigatório | Notas |
+|---|---|---|---|
+| `id` | string | Sim | Slug único, kebab-case. Ex: `"pampers-confort-sec-g"` |
+| `category` | string | Sim | Hoje só `"fraldas"` está ligado aos filtros da home. Também existem (sem UI ainda): `"lencos-umedecidos"`, `"pomada"`, `"formula-infantil"`, `"lanches-saudaveis"` |
+| `brand` | string | Sim | Ex: `"Pampers"` |
+| `name` | string | Sim | Ex: `"Pampers Confort Sec"` |
+| `size` | string | Não | Ex: `"RN"`, `"P"`, `"M"`, `"G"`, `"XG"`, `"XXG"` |
+| `packCount` | number | Não, mas recomendado | Quantidade de unidades do pacote — sem isso não dá pra calcular o preço por unidade |
+| `imageUrl` | string | Não | URL de uma imagem do produto |
+| `manualOffers` | Offer[] | Sim | Pelo menos 1 |
+
+**Oferta** (cada item de `manualOffers`):
+
+| Campo | Tipo | Obrigatório | Notas |
+|---|---|---|---|
+| `marketplace` | string | Sim | Exatamente um de: `"amazon"`, `"mercadolivre"`, `"shopee"` |
+| `title` | string | Sim | Título como aparece no anúncio daquela plataforma |
+| `price` | number | Sim | Preço atual, com ponto decimal (ex: `64.90`, nunca `"64,90"`) |
+| `originalPrice` | number | Não | Só se houver desconto ativo — sem isso não aparece o badge de % off |
+| `currency` | string | Sim | Sempre `"BRL"` |
+| `url` | string | Sim | Amazon/ML: URL limpa do produto (sem tag). Shopee: link de afiliado já gerado no portal deles |
+| `imageUrl` | string | Não | |
+| `available` | boolean | Sim | |
+| `updatedAt` | string | Sim | Data em que o preço foi conferido, formato `"YYYY-MM-DD"` |
+| `isManualPrice` | boolean | Sim | Sempre `true` por enquanto |
+
+Ver `src/lib/types.ts` (`Product`/`Offer`) pra a definição formal, e
+`src/data/products.json` pros exemplos completos.
+
 ## Antes de divulgar o site
 
-O catálogo em `src/data/products.ts` vem com **dados de exemplo**
+O catálogo em `src/data/products.json` vem com **dados de exemplo**
 (preços e URLs fictícios) só para você ver a busca funcionando — o site
 mostra um aviso de "modo demonstração" enquanto isso não for trocado.
 
@@ -61,7 +100,7 @@ mostra um aviso de "modo demonstração" enquanto isso não for trocado.
      gerado direto no app/portal deles)
 2. **Configure o `.env.local`** (copie de `.env.example`) com
    `ML_AFFILIATE_MATT_WORD`, `ML_AFFILIATE_MATT_TOOL` e `AMAZON_ASSOCIATE_TAG`.
-3. **Substitua os produtos de exemplo** em `src/data/products.ts` por
+3. **Substitua os produtos de exemplo** em `src/data/products.json` por
    produtos reais: preço conferido, URL de afiliado (Shopee: já pronta;
    Amazon e Mercado Livre: pode colar a URL limpa do produto, o tag/
    matt_word é adicionado sozinho).
@@ -88,7 +127,7 @@ no início): conecte o repositório, configure as variáveis de ambiente do
 
 - **Mais categorias**: o modelo (`src/lib/types.ts`) já suporta
   `lencos-umedecidos`, `pomada`, `formula-infantil` e `lanches-saudaveis` —
-  basta cadastrar produtos dessas categorias em `products.ts` e criar os
+  basta cadastrar produtos dessas categorias em `products.json` e criar os
   links de filtro na home.
 - **Lomadee** (rede de afiliados do grupo Méliuz, +300 lojas brasileiras,
   API de ofertas própria): boa segunda fonte de dados/links, inclusive para
@@ -117,7 +156,7 @@ no início): conecte o repositório, configure as variáveis de ambiente do
 - **Atualização automática de preços**: hoje as três plataformas são
   manuais. Se o volume crescer, considerar: (a) acesso à Amazon PA-API
   depois das primeiras vendas qualificadas, (b) a integração OAuth do
-  Mercado Livre acima, ou (c) migrar o catálogo de `products.ts` para uma
+  Mercado Livre acima, ou (c) migrar o catálogo de `products.json` para uma
   planilha (Google Sheets) ou banco de dados simples para facilitar a
   atualização sem precisar mexer em código.
 - **SEO**: como o tráfego orgânico do Google é o principal canal de

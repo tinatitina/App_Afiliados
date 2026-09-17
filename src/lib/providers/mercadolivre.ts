@@ -21,9 +21,12 @@ interface MLSearchResponse {
  * Busca ofertas ao vivo no Mercado Livre para um termo de busca.
  *
  * A API pública de busca não exige autenticação, mas não tem SLA
- * garantido (pode devolver 403 para alguns IPs/volumes). Por isso o
- * catálogo nunca deve depender só dela: em caso de erro, devolvemos
- * lista vazia e o produto continua aparecendo com as ofertas manuais.
+ * garantido: costuma devolver 403 para tráfego sem cara de navegador
+ * (sem User-Agent, vindo de IP de datacenter/cloud — o que inclui
+ * serverless da Vercel). Por isso mandamos um User-Agent de navegador.
+ * Mesmo assim, o catálogo nunca deve depender só dela: em caso de erro,
+ * devolvemos lista vazia e o produto continua aparecendo com as ofertas
+ * manuais.
  *
  * `url` aqui é o permalink cru do produto — o tag de afiliado é aplicado
  * depois, de forma centralizada, por `resolveAffiliateUrl` em
@@ -34,13 +37,21 @@ export async function searchMercadoLivre(query: string, limit = 4): Promise<Offe
 
   try {
     const res = await fetch(url, {
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json",
+        "Accept-Language": "pt-BR,pt;q=0.9",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
       // Revalida a cada hora: preços mudam, mas não precisamos de tempo real.
       next: { revalidate: 3600 },
     });
 
     if (!res.ok) {
-      console.warn(`[mercadolivre] busca falhou (${res.status}) para "${query}"`);
+      const body = await res.text().catch(() => "");
+      console.warn(
+        `[mercadolivre] busca falhou (${res.status}) para "${query}": ${body.slice(0, 300)}`,
+      );
       return [];
     }
 
